@@ -13,6 +13,16 @@ struct User {
     var lastName: String
     var phoneNumber: String
     var email: String
+    var profilePictureURL: String? // Örnek: Profil fotoğrafının URL'i
     // Diğer kullanıcı bilgilerini ekleyebilirsiniz
+
+    init(firstName: String, lastName: String, phoneNumber: String, email: String, profilePictureURL: String? = nil) {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.phoneNumber = phoneNumber
+        self.email = email
+        self.profilePictureURL = profilePictureURL
+    }
 }
+
 

@@ -26,34 +26,34 @@ class RegisterViewController: UIViewController {
     }
 
     @IBAction func signUpClicked(_ sender: Any) {
-        guard let firstName = nameText.text,
-                             let lastName = surnameText.text,
-                             let phoneNumber = phoneNumberText.text,
-                             let email = emailText.text,
-                             let password = passwordText.text,
-                             let confirmPassword = confirmPasswordText.text else {
-                           // Eksik bilgi var, kullanıcıyı uyar
-                           return
-                       }
+        guard let phoneNumber = phoneNumberText.text, !phoneNumber.isEmpty else {
+                    // Telefon numarası eksik, kullanıcıyı uyar
+                    return
+                }
 
-                       let user = User(firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, email: email)
+                authViewModel.startPhoneNumberVerification(phoneNumber) { [weak self] result in
+                    guard let self = self else { return }
 
-                       authViewModel.registerUser(user: user, password: password, confirmPassword: confirmPassword) { result in
-                           switch result {
-                           case .success:
-                               // Kayıt başarılı, telefon numarasını doğrulama ekranını göster
-                               self.showVerificationScreen(phoneNumber: phoneNumber)
-                           case .failure(let error):
-                               // Kayıt sırasında bir hata oluştu, kullanıcıyı uyar
-                               print("Kayıt hatası: \(error.localizedDescription)")
-                           }
-                       }
-                   }
+                    switch result {
+                    case .success:
+                        // Doğrulama başlatıldı, telefon numarasını doğrulama ekranını göster
+                        self.showVerificationScreen(phoneNumber: phoneNumber)
+                    case .failure(let error):
+                        // Başlatma sırasında bir hata oluştu, kullanıcıyı uyar
+                        print("Doğrulama başlatma hatası: \(error.localizedDescription)")
+                    }
+                }
+            }
 
-                   private func showVerificationScreen(phoneNumber: String) {
-                       let verificationVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "VerificationViewController") as! VerificationViewController
-                       verificationVC.authViewModel = authViewModel
-                       verificationVC.phoneNumber = phoneNumber
-                       present(verificationVC, animated: true, completion: nil)
-                   }
-               }
+    private func showVerificationScreen(phoneNumber: String) {
+            let verificationVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "VerificationViewController") as! VerificationViewController
+            verificationVC.authViewModel = authViewModel
+            verificationVC.phoneNumber = phoneNumber
+            verificationVC.firstName = nameText.text
+            verificationVC.lastName = surnameText.text
+            verificationVC.email = emailText.text
+            verificationVC.password = passwordText.text
+            present(verificationVC, animated: true, completion: nil)
+        }
+    }
+        
